@@ -1,0 +1,13 @@
+[run]
+source = .
+omit =
+    tests/*
+
+[report]
+exclude_lines =
+    pragma: no cover
+
+ignore_errors = True
+
+[html]
+directory = coverage_report
