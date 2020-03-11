@@ -21,7 +21,9 @@ class UserCRUD:
 
     def retrieve_user(self, email, password):
         orm_user = User.query.filter(User.email == email).one_or_none()
-        user = self.user_factory.from_orm(orm_user)
-        if user.verify_password(password):
-            return user
-        raise ValueError
+        if orm_user:
+            user = self.user_factory.from_orm(orm_user)
+            if user.verify_password(password):
+                return user
+            raise ValueError
+        return None

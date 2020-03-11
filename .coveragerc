@@ -1,4 +1,5 @@
 [run]
+branch = True
 source = .
 omit =
     tests/*
@@ -6,8 +7,6 @@ omit =
 [report]
 exclude_lines =
     pragma: no cover
-
-ignore_errors = True
 
 [html]
 directory = coverage_report

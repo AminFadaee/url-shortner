@@ -17,6 +17,7 @@ class TestUserCRUD(TestCase):
         self.app_context = self.app.app_context()
         self.app_context.push()
         db.create_all()
+        User.query.delete()
 
     def test_create_user_stores_the_data_correctly_in_database(self):
         UserCRUD(SimpleUserFactory()).create_user('foo@bar.com', '12341234')
@@ -34,10 +35,12 @@ class TestUserCRUD(TestCase):
         user = crud.retrieve_user('eggs@bar.com', '12341234')
         self.assertEqual(user.email, 'eggs@bar.com')
 
+    def test_retrieve_user_returns_none_when_email_does_not_exists(self):
+        crud = UserCRUD(SimpleUserFactory())
+        user = crud.retrieve_user('eggs@bar.com', '12341234')
+        self.assertIsNone(user)
+
     def test_retrieve_user_raises_value_error_upon_incorrect_password(self):
         crud = UserCRUD(SimpleUserFactory())
         crud.create_user('baz@bar.com', '12341234')
         self.assertRaises(ValueError, crud.retrieve_user, 'baz@bar.com', 'incorrect_password')
-
-    def tearDown(self) -> None:
-        User.query.delete()
