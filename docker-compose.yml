@@ -1,0 +1,37 @@
+version: '3'
+
+services:
+  app:
+    container_name: "url_app"
+    env_file:
+      - /data/url-shortner/env/app.env
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      - LC_ALL=C.UTF-8
+      - LANG=C.UTF-8
+    ports:
+      - "5000:5000"
+  db:
+    container_name: "url_db"
+    restart: always
+    env_file:
+      - /data/url-shortner/env/postgres.env
+    expose:
+      - 5432
+    image: postgres
+    volumes:
+      - /data/url-shortner/volumes/db:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "postgres"]
+    networks:
+      url_net:
+        ipv4_address: 10.0.0.6
+
+networks:
+  url_net:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.0.0.0/24
