@@ -1,6 +1,6 @@
 from flask import Flask
 
-from app.auth_views import auth_blueprint
+from app.views import auth_blueprint
 from app.config import Config
 from app.database import db
 

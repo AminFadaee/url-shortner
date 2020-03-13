@@ -51,3 +51,6 @@ class TestAuthViews(TestCase):
     def test_login_api_returns_400_with_invalid_data(self):
         response = self.client.post('/auth/login', json={'email': 'invalid_email', 'password': '123123'})
         self.assertEqual(response.status_code, 400)
+
+    def tearDown(self) -> None:
+        User.query.delete()
