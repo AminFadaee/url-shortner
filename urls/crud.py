@@ -1,7 +1,9 @@
+from urllib.parse import urlparse
+
 from sqlalchemy import func
 from sqlalchemy.exc import IntegrityError
 
-from app import db
+from app.database import db
 from urls.abstracts import Encoder
 from urls.url import URL
 
@@ -11,6 +13,9 @@ class URLCrud:
         self.encoder = encoder
 
     def create_url(self, user_id: int, url_str: str, custom_representation: str = None):
+        parsed_url = urlparse(url_str)
+        if not all([parsed_url.scheme, parsed_url.netloc]):
+            raise ValueError('Url is not formatted correctly!')
         if custom_representation is None:
             url = URL(user_id, url_str)
             db.session.add(url)

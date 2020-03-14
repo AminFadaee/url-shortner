@@ -1,6 +1,7 @@
 from flask_testing import TestCase
 
 from app import Config, create_app, db
+from urls.url import URL
 from users.crud import UserCRUD
 from users.factories import SimpleUserFactory
 from users.user import User
@@ -18,6 +19,7 @@ class TestAuthViews(TestCase):
         self.app_context = self.app.app_context()
         self.app_context.push()
         db.create_all()
+        URL.query.delete()
         User.query.delete()
         return self.app
 

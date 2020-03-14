@@ -16,10 +16,5 @@ class JWT:
         return jwt.encode(payload, self.secret, algorithm='HS256')
 
     def decode(self, auth_token):
-        try:
-            payload = jwt.decode(auth_token, self.secret)
-            return payload['sub']
-        except jwt.ExpiredSignatureError:
-            return 'Signature expired. Please log in again.'
-        except jwt.InvalidTokenError:
-            return 'Invalid token. Please log in again.'
+        payload = jwt.decode(auth_token, self.secret)
+        return payload['sub']
