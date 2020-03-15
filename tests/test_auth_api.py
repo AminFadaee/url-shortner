@@ -1,9 +1,9 @@
 from flask_testing import TestCase
 
 from app import Config, create_app, db
+from app import URLLog, URL, User
 from users.crud import UserCRUD
 from users.factories import SimpleUserFactory
-from users.user import User
 
 
 class TestConfig(Config):
@@ -18,6 +18,8 @@ class TestAuthViews(TestCase):
         self.app_context = self.app.app_context()
         self.app_context.push()
         db.create_all()
+        URLLog.query.delete()
+        URL.query.delete()
         User.query.delete()
         return self.app
 
@@ -51,3 +53,6 @@ class TestAuthViews(TestCase):
     def test_login_api_returns_400_with_invalid_data(self):
         response = self.client.post('/auth/login', json={'email': 'invalid_email', 'password': '123123'})
         self.assertEqual(response.status_code, 400)
+
+    def tearDown(self) -> None:
+        User.query.delete()
