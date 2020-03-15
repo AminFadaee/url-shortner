@@ -5,7 +5,7 @@ from users.abstracts import PasswordHasher, UserValidator
 class User(db.Model):
     __tablename__ = 'users'
 
-    id = db.Column(db.BigInteger, primary_key=True, index=True)
+    id = db.Column(db.Integer, primary_key=True, index=True)
     email = db.Column(db.String(length=50), index=True, unique=True)
     hashed_password = db.Column(db.String(length=200))
 
