@@ -10,10 +10,10 @@ from app.views.utilities import response, get_user_id
 from urls.crud import URLCrud
 from urls.encoders import SequentialEncoder
 
-shortner_blueprint = Blueprint('shortner', __name__)
+shortener_blueprint = Blueprint('shortener', __name__)
 
 
-class URLShortnerAPI(MethodView):
+class URLShortenerAPI(MethodView):
     def post(self):
         cache = RedisCacheFactory().create(name=app.config.get('REDIS_CACHE_NAME'),
                                            redis_host=app.config.get('REDIS_HOST'))
@@ -55,13 +55,13 @@ class URLShortnerAPI(MethodView):
         return response(status=HTTPStatus.MOVED_PERMANENTLY, headers={'Location': url})
 
 
-shortner_blueprint.add_url_rule(
+shortener_blueprint.add_url_rule(
     '/urls',
-    view_func=URLShortnerAPI.as_view('url_shortner_create'),
+    view_func=URLShortenerAPI.as_view('url_shortener_create'),
     methods=['POST']
 )
-shortner_blueprint.add_url_rule(
+shortener_blueprint.add_url_rule(
     '/r/<short_representation>',
-    view_func=URLShortnerAPI.as_view('url_shortner_retrieve'),
+    view_func=URLShortenerAPI.as_view('url_shortener_retrieve'),
     methods=['GET']
 )
