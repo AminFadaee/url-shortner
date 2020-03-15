@@ -28,16 +28,6 @@ services:
     networks:
       url_net:
         ipv4_address: 10.0.0.6
-  redis:
-    image: redis:5.0.4
-    privileged: true
-    restart: always
-    container_name: "url_redis"
-    volumes:
-      - /data/url-shortner/volumes/redis:/data
-    networks:
-      url_net:
-        ipv4_address: 10.0.0.5
 
 networks:
   url_net:
