@@ -1,3 +1,5 @@
+from typing import Tuple
+
 from redis import Redis
 
 from app.cache.abstracts import Cache
@@ -11,11 +13,13 @@ class RedisCache(Cache):
     def __getitem__(self, item: str):
         return self.get(item)
 
-    def __setitem__(self, key: str, value: str):
-        self.redis.hset(self.name, str(key), str(value))
+    def __setitem__(self, key: str, value: Tuple[int, str]):
+        self.redis.hset(self.name, str(key), f'{value[0]}:{value[1]}')
 
     def get(self, item: str):
         result = self.redis.hget(self.name, str(item))
         if result:
             result = result.decode()
-        return result
+            id, url = result.split(':', maxsplit=1)
+            return int(id), url
+        return None, None

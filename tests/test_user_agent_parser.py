@@ -1,6 +1,6 @@
 from unittest import TestCase
 
-from analytics.user_agent_parser import HTTPUserAgentParser
+from url_analytics.user_agent_parser import HTTPUserAgentParser
 
 
 class TestUserAgent(TestCase):

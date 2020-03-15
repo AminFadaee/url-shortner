@@ -1,6 +1,6 @@
 import httpagentparser
 
-from analytics.abstracts import UserAgentParser
+from url_analytics.abstracts import UserAgentParser
 
 
 class HTTPUserAgentParser(UserAgentParser):

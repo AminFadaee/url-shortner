@@ -8,3 +8,6 @@ class Config:
     JWT_EXPIRY_DAYS = 3
     REDIS_HOST = '10.0.0.5'
     REDIS_CACHE_NAME = 'cache'
+    RABBIT_HOST = '10.0.0.4'
+    RABBIT_USER = 'url'
+    RABBIT_PASSWORD = os.environ.get('RABBITMQ_DEFAULT_PASS')

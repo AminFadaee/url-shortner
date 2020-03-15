@@ -8,14 +8,14 @@ class UserAgentParser(ABC):
     @property
     @abstractmethod
     def os(self):
-        pass
+        pass  # pragma: no cover
 
     @property
     @abstractmethod
     def browser(self):
-        pass
+        pass  # pragma: no cover
 
     @property
     @abstractmethod
     def platform(self):
-        pass
+        pass  # pragma: no cover

@@ -1,5 +1,6 @@
 from unittest import TestCase
 
+from url_analytics.url_logs import URLLog
 from app import Config, create_app, db
 from urls.crud import URLCrud
 from urls.encoders import SequentialEncoder
@@ -20,6 +21,7 @@ class TestUserCRUD(TestCase):
         self.app_context = self.app.app_context()
         self.app_context.push()
         db.create_all()
+        URLLog.query.delete()
         URL.query.delete()
         User.query.delete()
         self.user = UserCRUD(SimpleUserFactory()).create_user('foo@bar.com', '12341234')

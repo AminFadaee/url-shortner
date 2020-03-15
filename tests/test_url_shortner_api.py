@@ -1,12 +1,13 @@
 from flask_testing import TestCase
 
-from app import Config, create_app, db
+from app.views.shortner_views import submit_url_log
+from app import Config, create_app
+from app import URLLog, URL, User
+from app.database import db
 from urls.crud import URLCrud
 from urls.encoders import SequentialEncoder
-from urls.url import URL
 from users.crud import UserCRUD
 from users.factories import SimpleUserFactory
-from users.user import User
 
 
 class TestConfig(Config):
@@ -21,11 +22,13 @@ class TestAuthViews(TestCase):
         self.app = create_app(TestConfig)
         self.app_context = self.app.app_context()
         self.app_context.push()
-        db.create_all()
+        URLLog.query.delete()
         URL.query.delete()
         User.query.delete()
+        db.create_all()
         self.user = UserCRUD(SimpleUserFactory()).create_user('foo@bar.com', '12341234')
         self.crud = URLCrud(SequentialEncoder())
+        submit_url_log.delay = submit_url_log
         return self.app
 
     def setUp(self) -> None:
@@ -37,6 +40,20 @@ class TestAuthViews(TestCase):
         response = self.client.get(f'/r/{representation}')
         self.assertEqual(301, response.status_code)
         self.assertEqual(response.headers['Location'], 'https://foo.bar.com')
+
+    def test_url_shortner_create_url_log_correctly(self):
+        url, representation = self.crud.create_url(self.user.id, 'https://foo.bar.com')
+        response = self.client.get(
+            f'/r/{representation}',
+            headers={'User-Agent': 'Mozilla/5.0 (Linux; Android 7.0; SM-G892A Build/NRD90M; wv)'
+                                   'AppleWebKit/537.36 (KHTML, like Gecko)'
+                                   'Version/4.0 Chrome/60.0.3112.107 Mobile Safari/537.36'}
+        )
+        url_log: URLLog = URLLog.query.filter(URLLog.url_id == url.id).one_or_none()
+        self.assertEqual(url.id, url_log.url_id)
+        self.assertEqual('Chrome', url_log.browser)
+        self.assertEqual('Linux', url_log.os)
+        self.assertEqual('Android', url_log.platform)
 
     def test_url_shortner_get_returns_404_for_unavailable__or_invalid_url(self):
         response = self.client.get('/r/unavailable')
@@ -89,7 +106,3 @@ class TestAuthViews(TestCase):
         response = self.client.get(f'{short_uri}')
         self.assertEqual(301, response.status_code)
         self.assertEqual(response.headers['Location'], 'https://foo.bar.com?var=3&another_var=2')
-
-    def tearDown(self) -> None:
-        URL.query.delete()
-        User.query.delete()
