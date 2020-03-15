@@ -3,6 +3,7 @@ branch = True
 source = .
 omit =
     tests/*
+    url_shortner.py
 
 [report]
 exclude_lines =
