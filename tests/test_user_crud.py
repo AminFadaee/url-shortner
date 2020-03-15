@@ -1,9 +1,9 @@
 from unittest import TestCase
 
 from app import Config, create_app, db
+from app import URLLog, URL, User
 from users.crud import UserCRUD
 from users.factories import SimpleUserFactory
-from users.user import User
 
 
 class TestConfig(Config):
@@ -17,6 +17,8 @@ class TestUserCRUD(TestCase):
         self.app_context = self.app.app_context()
         self.app_context.push()
         db.create_all()
+        URLLog.query.delete()
+        URL.query.delete()
         User.query.delete()
 
     def test_create_user_stores_the_data_correctly_in_database(self):

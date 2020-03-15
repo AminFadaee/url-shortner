@@ -1,26 +1,17 @@
 from http import HTTPStatus
-from typing import Dict
 
-from flask import Blueprint, request, make_response, jsonify
+from flask import Blueprint, request
 from flask import current_app as app
 from flask.views import MethodView
 
 from app.config import Config
+from app.views.utilities import response
 from authorization.token import JWT
 from users.crud import UserCRUD
 from users.factories import SimpleUserFactory
-from users.user import User
 from users.validators import SimpleUserValidator
 
 auth_blueprint = Blueprint('auth', __name__)
-
-
-def response(message: str, status: HTTPStatus, data: Dict = None):
-    payload = {
-        'data': data or {},
-        'message': message
-    }
-    return make_response(jsonify(payload)), status
 
 
 class RegisterAPI(MethodView):
@@ -32,7 +23,7 @@ class RegisterAPI(MethodView):
         except ValueError:
             return response(message='Incorrect data!', status=HTTPStatus.BAD_REQUEST)
         crud = UserCRUD(SimpleUserFactory())
-        user = User.query.filter(User.email == post_data.get('email')).one_or_none()
+        user = crud.retrieve_user_without_password(email=post_data.get('email'))
         if not user:
             user = crud.create_user(email=post_data.get('email'), password=post_data.get('password'))
             auth_token = JWT(app.config.get('JWT_SECRET')).encode(user.id, Config.JWT_EXPIRY_DAYS)

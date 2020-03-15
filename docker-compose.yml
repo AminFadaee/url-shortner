@@ -13,6 +13,7 @@ services:
       - LANG=C.UTF-8
     ports:
       - "5000:5000"
+
   db:
     container_name: "url_db"
     restart: always
@@ -28,6 +29,43 @@ services:
     networks:
       url_net:
         ipv4_address: 10.0.0.6
+
+  redis:
+    image: redis:5.0.4
+    privileged: true
+    restart: always
+    container_name: "url_redis"
+    volumes:
+      - /data/url-shortner/volumes/redis:/data
+    networks:
+      url_net:
+        ipv4_address: 10.0.0.5
+
+  rabbit:
+    image: rabbitmq:3-management
+    container_name: "url_rabbit"
+    restart: always
+    expose:
+      - 5672
+      - 15672
+    env_file:
+      - /data/url-shortner/env/app.env
+    volumes:
+      - /data/pandora/volumes/rabbit:/var/lib/rabbitmq
+    networks:
+      url_net:
+        ipv4_address: 10.0.0.4
+
+  worker:
+    container_name: "url_worker"
+    env_file:
+      - /data/url-shortner/env/app.env
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: celery -A app.tasks:celery worker -c=10 -n url@%h -l info
+    networks:
+      - url_net
 
 networks:
   url_net:
