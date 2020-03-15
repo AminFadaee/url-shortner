@@ -1,12 +1,12 @@
 from sqlalchemy.exc import IntegrityError
 
 from app.database import db
-from users.factories import SimpleUserFactory
+from users.abstracts import UserFactory
 from users.user import User
 
 
 class UserCRUD:
-    def __init__(self, user_factory: SimpleUserFactory):
+    def __init__(self, user_factory: UserFactory):
         self.user_factory = user_factory
 
     def create_user(self, email, password):
