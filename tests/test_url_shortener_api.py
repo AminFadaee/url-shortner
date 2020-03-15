@@ -1,6 +1,6 @@
 from flask_testing import TestCase
 
-from app.views.shortner_views import submit_url_log
+from app.views.shortener_views import submit_url_log
 from app import Config, create_app
 from app import URLLog, URL, User
 from app.database import db
@@ -35,13 +35,13 @@ class TestAuthViews(TestCase):
         response = self.client.post('/auth/login', json={'email': 'foo@bar.com', 'password': '12341234'})
         self.token = response.json['data']['auth_token']
 
-    def test_url_shortner_get_redirects_to_correct_link(self):
+    def test_url_shortener_get_redirects_to_correct_link(self):
         url, representation = self.crud.create_url(self.user.id, 'https://foo.bar.com')
         response = self.client.get(f'/r/{representation}')
         self.assertEqual(301, response.status_code)
         self.assertEqual(response.headers['Location'], 'https://foo.bar.com')
 
-    def test_url_shortner_create_url_log_correctly(self):
+    def test_url_shortener_create_url_log_correctly(self):
         url, representation = self.crud.create_url(self.user.id, 'https://foo.bar.com')
         response = self.client.get(
             f'/r/{representation}',
@@ -55,17 +55,17 @@ class TestAuthViews(TestCase):
         self.assertEqual('Linux', url_log.os)
         self.assertEqual('Android', url_log.platform)
 
-    def test_url_shortner_get_returns_404_for_unavailable__or_invalid_url(self):
+    def test_url_shortener_get_returns_404_for_unavailable__or_invalid_url(self):
         response = self.client.get('/r/unavailable')
         self.assertEqual(404, response.status_code)
         response = self.client.get('/r/in.vali.d')
         self.assertEqual(404, response.status_code)
 
-    def test_url_shortner_post_returns_401_for_unauthorized_users(self):
+    def test_url_shortener_post_returns_401_for_unauthorized_users(self):
         response = self.client.post('/urls', json={'url': 'https://foo.com'})
         self.assertEqual(401, response.status_code)
 
-    def test_url_shortner_post_returns_401_for_bad_token(self):
+    def test_url_shortener_post_returns_401_for_bad_token(self):
         response = self.client.post(
             '/urls',
             json={'url': 'bad.url'},
@@ -73,7 +73,7 @@ class TestAuthViews(TestCase):
         )
         self.assertEqual(401, response.status_code)
 
-    def test_url_shortner_post_returns_400_for_bad_urls(self):
+    def test_url_shortener_post_returns_400_for_bad_urls(self):
         response = self.client.post(
             '/urls',
             json={'url': 'bad.url'},
@@ -81,7 +81,7 @@ class TestAuthViews(TestCase):
         )
         self.assertEqual(400, response.status_code)
 
-    def test_url_shortner_works_correctly_given_token_and_correct_url(self):
+    def test_url_shortener_works_correctly_given_token_and_correct_url(self):
         response = self.client.post(
             '/urls',
             json={'url': 'https://foo.bar.com?var=3&another_var=2'},
@@ -94,7 +94,7 @@ class TestAuthViews(TestCase):
         self.assertEqual(301, response.status_code)
         self.assertEqual(response.headers['Location'], 'https://foo.bar.com?var=3&another_var=2')
 
-    def test_url_shortner_uses_cache_if_exists(self):
+    def test_url_shortener_uses_cache_if_exists(self):
         short_uri = self.client.post(
             '/urls',
             json={'url': 'https://foo.bar.com?var=3&another_var=2'},
