@@ -1,0 +1,232 @@
+openapi: "3.0.0"
+info:
+  version: 1.0.0
+  description: URL-Shortener API Design
+  title: URL-Shortener
+paths:
+  /auth/register:
+    post:
+      summary: Create a token given email and password and register the email
+      requestBody:
+        description: email and password
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  $ref: '#/components/schemas/Email'
+                password:
+                  $ref: '#/components/schemas/Password'
+      responses:
+        '201':
+          description: user created
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Response'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          auth_token:
+                            $ref: '#/components/schemas/AuthToken'
+        '400':
+          description: Bad input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '409':
+          description: User already exists
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+  /auth/login:
+    post:
+      security:
+        - bearer: []
+      summary: Generate a token given email and password
+      requestBody:
+        description: email and password
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  $ref: '#/components/schemas/Email'
+                password:
+                  $ref: '#/components/schemas/Password'
+      responses:
+        '200':
+          description: login successful
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Response'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          auth_token:
+                            $ref: '#/components/schemas/AuthToken'
+        '400':
+          description: Bad input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '401':
+          description: Bad token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+  /urls:
+    post:
+      security:
+        - bearer: []
+      summary: create a short url given original url and an optional representation
+      requestBody:
+        description: url and an optional representation
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                url:
+                  $ref: '#/components/schemas/URL'
+                custom:
+                  $ref: '#/components/schemas/CustomRepresentation'
+      responses:
+        '201':
+          description: short url created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/URLResponse'
+        '400':
+          description: Bad input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '401':
+          description: Bad token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+  /r/{short_representation}:
+    get:
+      summary: redirects the short url to original url
+      parameters:
+        - in: path
+          name: short_representation
+          schema:
+            type: string
+          required: true
+          description: short representation of the original url
+      responses:
+        '301':
+          description: Returns a response with the location header of the original url.
+          headers:
+            Location:
+              schema:
+                type: string
+                format: uri
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+  /analytics/{url_id}:
+    get:
+      security:
+        - bearer: []
+      summary: fetch the analytics of a specific url
+      parameters:
+        - in: path
+          name: url_id
+          schema:
+            type: integer
+          required: true
+          description: id of a url
+      responses:
+        '200':
+          description: analytics of url
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/URLAnalyticsResponse'
+        '401':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+
+components:
+  securitySchemes:
+    bearer:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    Email:
+      description: a valid email address
+      type: string
+      format: email
+    Password:
+      description: user password
+      type: string
+      minLength: 6
+    URL:
+      description: valid url string
+      type: string
+      format: uri
+    CustomRepresentation:
+      description: custom short representation for url
+      type: string
+      minLength: 3
+    ID:
+      description: id of resource
+      type: integer
+    URLResponse:
+      type: object
+      properties:
+        id:
+          $ref: '#/components/schemas/ID'
+        original_url:
+          type: string
+          format: uri
+        short_uri:
+          type: string
+          format: uri
+    URLAnalyticsResponse:
+      type: object
+      properties:
+        url_id:
+          $ref: '#/components/schemas/ID'
+        total_view:
+          type: integer
+    Response:
+      type: object
+      properties:
+        message:
+          type: string
+        data:
+          type: object
+    AuthToken:
+      description: user authentication token
+      type: string
