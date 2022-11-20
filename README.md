@@ -22,5 +22,3 @@ I hope to extend this to more detailed analytic features.
 
 ## Author
 Amin Fadaee
-
-*Checkout my channel: [BackendLife](https://t.me/backendlife)*
